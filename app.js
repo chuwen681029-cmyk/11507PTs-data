@@ -39,13 +39,18 @@ function gapiLoaded() {
 }
 
 async function initializeGapiClient() {
-  await gapi.client.init({
-    apiKey: CONFIG.API_KEY,
-    discoveryDocs: [
-      "https://sheets.googleapis.com/$discovery/rest?version=v4",
-      "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"
-    ],
-  });
+  try {
+    await gapi.client.init({
+      apiKey: CONFIG.API_KEY,
+      discoveryDocs: [
+        "https://sheets.googleapis.com/$discovery/rest?version=v4",
+        "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"
+      ],
+    });
+    console.log("GAPI client initialized OK");
+  } catch(e) {
+    console.error("GAPI init error:", e);
+  }
 }
 
 function gisLoaded() {
@@ -58,6 +63,10 @@ function gisLoaded() {
       "https://www.googleapis.com/auth/userinfo.profile"
     ].join(" "),
     callback: handleAuthResponse,
+    error_callback: (err) => {
+      console.warn("token client error", err);
+      showToast("登入視窗被阻擋，請允許彈出視窗後再試", "error");
+    }
   });
 }
 
@@ -66,7 +75,7 @@ function handleLoginClick() {
     showToast("Google API 尚未載入完成，請稍後再試", "error");
     return;
   }
-  tokenClient.requestAccessToken();
+  tokenClient.requestAccessToken({ prompt: "select_account" });
 }
 
 async function handleAuthResponse(resp) {
