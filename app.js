@@ -38,6 +38,9 @@ function gapiLoaded() {
   gapi.load("client", initializeGapiClient);
 }
 
+// 確保 gapi client 已完整載入（含 discovery docs）
+let gapiReady = false;
+
 async function initializeGapiClient() {
   try {
     await gapi.client.init({
@@ -47,9 +50,11 @@ async function initializeGapiClient() {
         "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"
       ],
     });
+    gapiReady = true;
     console.log("GAPI client initialized OK");
   } catch(e) {
     console.error("GAPI init error:", e);
+    showToast("Google API 初始化失敗，請重新整理頁面", "error");
   }
 }
 
@@ -84,7 +89,21 @@ async function handleAuthResponse(resp) {
     return;
   }
   accessToken = resp.access_token;
+
+  // 確保 token 正確設定到 gapi client
   gapi.client.setToken({ access_token: accessToken });
+
+  // 等待 gapi client 完全初始化後再繼續
+  await new Promise(resolve => {
+    const check = () => {
+      if (gapiReady && gapi.client.sheets && gapi.client.drive) {
+        resolve();
+      } else {
+        setTimeout(check, 300);
+      }
+    };
+    check();
+  });
 
   // 取得使用者資訊
   const userInfo = await fetchUserInfo();
@@ -94,6 +113,7 @@ async function handleAuthResponse(resp) {
   isAdmin = CONFIG.ADMIN_EMAILS.map(e => e.toLowerCase().trim())
     .includes(userInfo.email.toLowerCase().trim());
 
+  showToast("登入成功，載入資料中...", "");
   await loadAllSheetData();
   renderMainApp();
 }
