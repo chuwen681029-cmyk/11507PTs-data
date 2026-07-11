@@ -1,0 +1,679 @@
+/* ============================================
+   115-07 學生實習資料管理系統
+   設計概念：診療紀錄表 / 病歷夾風格
+   ============================================ */
+
+:root {
+  /* 色彩系統 - 取自醫療記錄的牛皮紙夾 + 印章色 */
+  --paper: #f6f3ec;
+  --paper-line: #ddd6c7;
+  --ink: #2b2a28;
+  --ink-soft: #6b6459;
+  --tab-active: #ffffff;
+  --tab-inactive: #e8e2d3;
+  --stamp-green: #2f6b4f;
+  --stamp-green-bg: #e3eee7;
+  --stamp-red: #b3473e;
+  --stamp-red-bg: #f6e6e3;
+  --stamp-amber: #b3833e;
+  --stamp-amber-bg: #f6ece0;
+  --accent: #8a6d4b;
+  --border: #c9c0ab;
+  --shadow: 0 2px 8px rgba(43, 42, 40, 0.08);
+
+  --font-display: "Noto Serif TC", "Source Han Serif TC", serif;
+  --font-body: "Noto Sans TC", "Source Han Sans TC", sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    repeating-linear-gradient(transparent, transparent 39px, var(--paper-line) 39px, var(--paper-line) 40px);
+  min-height: 100vh;
+}
+
+/* ============ Header ============ */
+.site-header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 28px 32px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.site-header::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  border: 2px solid rgba(246,243,236,0.08);
+  border-radius: 50%;
+}
+
+.site-header::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 30px;
+  width: 100px;
+  height: 100px;
+  border: 1px dashed rgba(246,243,236,0.15);
+  border-radius: 50%;
+}
+
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #cdbf9f;
+  margin: 0 0 6px;
+}
+
+.header-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.header-sub {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #b9b2a3;
+}
+
+.header-account {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.header-account img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--paper);
+}
+
+.btn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 4px;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.02em;
+}
+
+.btn-light {
+  color: var(--paper);
+}
+.btn-light:hover {
+  background: rgba(246,243,236,0.12);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #745a3a;
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink);
+}
+.btn-outline:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.btn-sm {
+  font-size: 12px;
+  padding: 5px 12px;
+}
+
+/* ============ Layout ============ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px 80px;
+}
+
+.login-gate {
+  max-width: 480px;
+  margin: 80px auto;
+  text-align: center;
+  background: var(--tab-active);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 48px 40px;
+  box-shadow: var(--shadow);
+}
+
+.login-gate .stamp-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--accent);
+  transform: rotate(-8deg);
+}
+
+.login-gate h1 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  margin: 0 0 8px;
+}
+
+.login-gate p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 28px;
+}
+
+/* ============ Tabs (期初 / 期末) ============ */
+.period-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+  border-bottom: 2px solid var(--ink);
+}
+
+.period-tab {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  padding: 12px 32px 10px;
+  background: var(--tab-inactive);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  color: var(--ink-soft);
+  position: relative;
+  top: 2px;
+  transition: all 0.15s ease;
+}
+
+.period-tab.active {
+  background: var(--tab-active);
+  color: var(--ink);
+  border-color: var(--ink);
+  top: 0;
+}
+
+.period-tab .tab-meta {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* ============ Panel ============ */
+.panel {
+  background: var(--tab-active);
+  border: 1px solid var(--ink);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.panel-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.panel-toolbar .search-box {
+  position: relative;
+}
+
+.search-box input {
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 8px 12px 8px 32px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--paper);
+  width: 220px;
+}
+
+.search-box::before {
+  content: "🔍";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-done { background: var(--stamp-green); }
+.dot-missing { background: var(--stamp-red); }
+.dot-pending { background: var(--stamp-amber); }
+
+/* ============ Summary Table ============ */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--paper-line);
+  border-radius: 4px;
+}
+
+table.summary {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 900px;
+}
+
+table.summary thead th {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 10px 8px;
+  text-align: center;
+  letter-spacing: 0.03em;
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
+}
+
+table.summary thead th:first-child,
+table.summary thead th:nth-child(2),
+table.summary thead th:nth-child(3) {
+  text-align: left;
+}
+
+table.summary tbody td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--paper-line);
+  text-align: center;
+  white-space: nowrap;
+}
+
+table.summary tbody td.name-cell {
+  text-align: left;
+  font-weight: 600;
+}
+
+table.summary tbody td.school-cell {
+  text-align: left;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+table.summary tbody tr:hover {
+  background: #faf8f2;
+}
+
+table.summary tbody tr.current-user {
+  background: #f0ece1;
+}
+
+.progress-cell {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s ease;
+}
+
+.status-chip:hover {
+  transform: scale(1.15);
+}
+
+.status-done {
+  background: var(--stamp-green-bg);
+  color: var(--stamp-green);
+}
+
+.status-missing {
+  background: var(--stamp-red-bg);
+  color: var(--stamp-red);
+}
+
+.status-pending {
+  background: var(--stamp-amber-bg);
+  color: var(--stamp-amber);
+}
+
+.field-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.field-empty {
+  color: var(--stamp-red);
+  font-size: 12px;
+}
+
+/* ============ Student Detail Panel ============ */
+.detail-section {
+  margin-top: 28px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.detail-header h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin: 0;
+}
+
+.detail-header .detail-school {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.doc-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.doc-card.is-done {
+  border-color: var(--stamp-green);
+  background: var(--stamp-green-bg);
+}
+
+.doc-card-title {
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.doc-card-status {
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.doc-card-status.ok { color: var(--stamp-green); }
+.doc-card-status.no { color: var(--stamp-red); }
+
+.doc-card-filename {
+  font-size: 12px;
+  color: var(--ink-soft);
+  word-break: break-all;
+  font-family: var(--font-mono);
+}
+
+.file-input-wrap {
+  position: relative;
+}
+
+.file-input-wrap input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.file-input-label {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  padding: 8px;
+  border: 1.5px dashed var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.file-input-label:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Form fields (登打資料) */
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.field-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  background: var(--paper);
+}
+
+.field-card.is-filled {
+  border-color: var(--stamp-green);
+}
+
+.field-card label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.field-card input,
+.field-card select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: #fff;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--paper-line);
+}
+
+/* ============ Toast ============ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: var(--stamp-red);
+}
+
+.toast.success {
+  background: var(--stamp-green);
+}
+
+/* ============ Modal ============ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43,42,40,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 8px;
+  padding: 28px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.modal-box h3 {
+  font-family: var(--font-display);
+  margin: 0 0 12px;
+}
+
+.modal-box p {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ============ Footer note ============ */
+.setup-banner {
+  background: var(--stamp-amber-bg);
+  border: 1px solid var(--stamp-amber);
+  color: #6b4d1e;
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+
+.setup-banner code {
+  background: rgba(0,0,0,0.06);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+/* ============ Responsive ============ */
+@media (max-width: 720px) {
+  .site-header { padding: 24px 18px; }
+  .header-title { font-size: 24px; }
+  .header-account { position: static; margin-top: 16px; }
+  .container { padding: 20px 14px 60px; }
+  .period-tab { padding: 10px 18px 8px; font-size: 15px; }
+  .panel { padding: 16px; }
+}
