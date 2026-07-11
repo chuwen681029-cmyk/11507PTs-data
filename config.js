@@ -24,7 +24,7 @@ const CONFIG = {
   // 管理者的 Google 帳號 Email（只有這些帳號登入後可看到管理後台與所有人資料）
   // 可填多個，用逗號分隔
   ADMIN_EMAILS: [
-    "ylh.115pts@gmail.com"，"chuwen681029@gmail.com"
+    "ylh.115pts@gmail.com","chuwen681029@gmail.com"
   ],
 
   // 試算表中各分頁名稱
