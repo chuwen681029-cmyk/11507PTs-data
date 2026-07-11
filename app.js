@@ -275,18 +275,21 @@ async function loadAllSheetData() {
 }
 
 async function ensureSheetExists(period) {
+  // 分頁已手動建立，直接跳過檢查
+  // 若分頁內沒有表頭，自動寫入
   const sheetName = CONFIG.SHEET_NAMES[period];
   try {
-    const meta = await sheetsGetMeta();
-    const exists = meta.sheets.some(s => s.properties.title === sheetName);
-    if (!exists) {
-      await sheetsBatchUpdate([{ addSheet: { properties: { title: sheetName } } }]);
+    const res = await sheetsGet(`${sheetName}!A1:A1`);
+    const firstCell = (res.values && res.values[0] && res.values[0][0]) || "";
+    if (firstCell !== "學號") {
+      // 寫入表頭與學生初始列
       const header = getSheetHeaderRow(period);
       const rows = STUDENTS.map(s => [s.id, s.school, s.name, ...header.slice(3).map(() => "")]);
       await sheetsUpdate(`${sheetName}!A1`, [header, ...rows]);
+      console.log(`${sheetName} 表頭已建立`);
     }
   } catch(e) {
-    console.error("ensureSheetExists error", e);
+    console.error("ensureSheetExists error", e.message);
     showToast("試算表存取失敗：" + e.message, "error");
   }
 }
