@@ -14,7 +14,7 @@ const CONFIG = {
   // 「115-07 學生資料」試算表的 ID
   // 從試算表網址取得：
   // https://docs.google.com/spreadsheets/d/【這一段就是SPREADSHEET_ID】/edit
-  SPREADSHEET_ID: "1OKQO0P0tQr99hU0aPzNdUCABiL4xXKRTGrO6MXnalao",
+ SPREADSHEET_ID: "1OKQO0P0tQr99hU0aPzNdUCABiL4xXKRTGrO6MXnalao",
 
   // Google Drive 中「115-07 學生資料」資料夾的 ID
   // 從資料夾網址取得：
