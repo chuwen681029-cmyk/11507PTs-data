@@ -687,9 +687,14 @@ async function handleFieldChange(studentId, fieldKey, fieldLabel) {
 // ----------------------------------------------------
 function getMyStudentId() {
   if (!currentUser) return null;
-  // 以登入帳號的顯示姓名比對學生名單（移除空白）
-  const myName = (currentUser.name || "").replace(/\s/g, "");
-  const found = STUDENTS.find(s => s.name.replace(/\s/g, "") === myName);
+  // 優先以 email 比對（最準確）
+  const myEmail = (currentUser.email || "").toLowerCase().trim();
+  let found = STUDENTS.find(s => s.email && s.email.toLowerCase().trim() === myEmail);
+  // 備用：以 Google 顯示姓名比對（移除空白）
+  if (!found) {
+    const myName = (currentUser.name || "").replace(/\s/g, "");
+    found = STUDENTS.find(s => s.name.replace(/\s/g, "") === myName);
+  }
   return found ? found.id : null;
 }
 
