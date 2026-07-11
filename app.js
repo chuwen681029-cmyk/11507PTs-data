@@ -43,13 +43,10 @@ let gapiReady = false;
 
 async function initializeGapiClient() {
   try {
-    await gapi.client.init({
-      apiKey: CONFIG.API_KEY,
-      discoveryDocs: [
-        "https://sheets.googleapis.com/$discovery/rest?version=v4",
-        "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"
-      ],
-    });
+    // 只載入 discovery docs，不傳 apiKey（Sheets/Drive 需 OAuth token，不是 API Key）
+    await gapi.client.init({});
+    await gapi.client.load("https://sheets.googleapis.com/$discovery/rest?version=v4");
+    await gapi.client.load("https://www.googleapis.com/discovery/v1/apis/drive/v3/rest");
     gapiReady = true;
     console.log("GAPI client initialized OK");
   } catch(e) {
